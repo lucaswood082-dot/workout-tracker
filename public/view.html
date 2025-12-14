@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Workouts</title>
+</head>
+<body>
+  <h1>My Workouts</h1>
+  <ul id="workout-list"></ul>
+  <button onclick="goHome()">Home</button>
+  <button onclick="goAdd()">Add Workout</button>
+
+  <script>
+    const userId = localStorage.getItem('userId');
+    if (!userId) window.location.href = '/';
+
+    async function loadWorkouts() {
+      try {
+        const res = await fetch(`/api/workouts/${userId}`);
+        const workouts = await res.json();
+        const list = document.getElementById('workout-list');
+        list.innerHTML = '';
+        workouts.forEach(w => {
+          const li = document.createElement('li');
+          li.textContent = `${w.exercise} - ${w.sets} sets x ${w.reps} reps - ${w.weight} kg`;
+          list.appendChild(li);
+        });
+      } catch (err) {
+        console.error(err);
+        alert("Error loading workouts");
+      }
+    }
+
+    function goHome() {
+      window.location.href = '/';
+    }
+
+    function goAdd() {
+      window.location.href = '/add.html';
+    }
+
+    // Load workouts when page loads
+    loadWorkouts();
+  </script>
+</body>
+</html>
