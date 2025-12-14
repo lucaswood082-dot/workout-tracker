@@ -1,21 +1,17 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Workout Tracker</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<input type="text" id="username" placeholder="Enter your username">
+<button onclick="login()">Go</button>
 
-<h1>Workout Tracker</h1>
-
-<input id="exercise" placeholder="Exercise">
-<input id="sets" placeholder="Sets">
-<input id="reps" placeholder="Reps">
-<input id="weight" placeholder="Weight (kg)">
-<button onclick="addWorkout()">Add Workout</button>
-
-<ul id="workoutList"></ul>
-
-<script src="script.js"></script>
-</body>
-</html>
+<script>
+async function login() {
+  const username = document.getElementById("username").value;
+  // Check if user exists or create
+  let res = await fetch('/api/users', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username })
+  });
+  const data = await res.json();
+  localStorage.setItem('userId', data._id);
+  window.location.href = '/home.html';
+}
+</script>

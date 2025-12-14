@@ -1,38 +1,31 @@
-// Debug log
-console.log("Server file loaded");
-
-// Load environment variables
-require('dotenv').config();
-
-// Import dependencies
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const path = require("path");
+require("dotenv").config();
 
-// Create Express app
 const app = express();
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static("public"));
 
-// Serve frontend files
-app.use(express.static(path.join(__dirname, "public")));
-
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
+// MongoDB connection
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.error("MongoDB connection error:", err));
+  .catch(err => console.log(err));
 
-// API routes (ensure routes folder exists with workouts.js inside)
+// Routes
+app.use("/api/users", require("./routes/users"));
 app.use("/api/workouts", require("./routes/workouts"));
 
-// Serve index.html on root
+// Serve frontend
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(__dirname + "/public/index.html");
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
