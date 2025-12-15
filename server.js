@@ -15,8 +15,11 @@ app.use(express.json());
 /* Serve frontend */
 app.use(express.static(path.join(__dirname, "public")));
 
-/* Connect to MongoDB FIRST */
-mongoose.connect(process.env.MONGO_URI)
+/* Connect to MongoDB */
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
   .then(() => {
     console.log("MongoDB Connected");
 
@@ -24,11 +27,12 @@ mongoose.connect(process.env.MONGO_URI)
     app.use("/api/users", require("./routes/users"));
     app.use("/api/workouts", require("./routes/workouts"));
 
-    /* Catch-all: serve frontend */
+    /* Catch-all: serve index.html for frontend routing */
     app.get("*", (req, res) => {
       res.sendFile(path.join(__dirname, "public", "index.html"));
     });
 
+    /* Start server on Render's assigned PORT */
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
