@@ -1,70 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Ascend – Workout Tracker</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ascend – Login</title>
+  <style>
+    /* Body & container */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f8ff; /* light blue background */
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0 20px;
+    }
+
+    h1 {
+      color: #1e90ff; /* darker blue */
+    }
+
+    /* Forms & inputs */
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 400px;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    input {
+      padding: 10px;
+      margin: 10px 0;
+      width: 90%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px;
+      margin-top: 10px;
+      width: 50%;
+      background-color: #1e90ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #0f74d0;
+    }
+
+    #status {
+      margin-top: 10px;
+      color: #555;
+    }
+  </style>
 </head>
 <body>
 
   <h1>Ascend</h1>
   <p>Enter a username to start tracking your workouts</p>
 
-  <input
-    type="text"
-    id="username"
-    placeholder="Username"
-    autocomplete="off"
-  />
-
-  <br><br>
-
-  <button id="startBtn">Start Tracking</button>
+  <form id="userForm">
+    <input type="text" id="username" placeholder="Username" required>
+    <button type="submit">Start Tracking</button>
+  </form>
 
   <p id="status" style="display:none;">Loading...</p>
 
   <script>
-    const startBtn = document.getElementById("startBtn");
+    const userForm = document.getElementById("userForm");
     const statusText = document.getElementById("status");
 
-    startBtn.addEventListener("click", async () => {
+    userForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
       const username = document.getElementById("username").value.trim();
+      if (!username) return alert("Please enter a username");
 
-      if (!username) {
-        alert("Please enter a username");
-        return;
-      }
-
-      startBtn.disabled = true;
       statusText.style.display = "block";
 
       try {
         const res = await fetch("/api/users", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username })
         });
-
-        if (!res.ok) {
-          throw new Error("Failed to create or fetch user");
-        }
-
         const data = await res.json();
 
-        // ✅ SAVE USER ID
         localStorage.setItem("userId", data._id);
 
-        console.log("Saved userId:", data._id);
-
-        // ✅ GO TO ADD WORKOUT PAGE
+        // Redirect to add workout page
         window.location.href = "/add.html";
-
       } catch (err) {
         console.error(err);
-        alert("Login failed. Check console.");
-        startBtn.disabled = false;
+        alert("Failed to login/create user");
         statusText.style.display = "none";
       }
     });
