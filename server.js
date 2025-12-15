@@ -8,36 +8,25 @@ dotenv.config();
 
 const app = express();
 
-/* Middleware */
 app.use(cors());
 app.use(express.json());
-
-/* Serve frontend */
 app.use(express.static(path.join(__dirname, "public")));
 
-/* Connect to MongoDB */
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB Connected");
 
-    /* API Routes */
     app.use("/api/users", require("./routes/users"));
     app.use("/api/workouts", require("./routes/workouts"));
 
-    /* Catch-all: serve index.html for frontend routing */
     app.get("*", (req, res) => {
       res.sendFile(path.join(__dirname, "public", "index.html"));
     });
 
-    /* Start server on Render's assigned PORT */
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch(err => {
     console.error("MongoDB connection error:", err);
+    process.exit(1); // Make sure it logs the error and stops
   });
